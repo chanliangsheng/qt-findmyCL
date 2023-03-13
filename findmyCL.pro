@@ -24,7 +24,8 @@ SOURCES += \
     ms1.cpp \
     ms1match.cpp \
     ms2.cpp \
-    mzml.cpp
+    mzml.cpp \
+    singlems1match.cpp
 
 HEADERS += \
     base64.h \
@@ -34,7 +35,8 @@ HEADERS += \
     ms1.h \
     ms1match.h \
     ms2.h \
-    mzml.h
+    mzml.h \
+    singlems1match.h
 
 FORMS += \
     mainwindow.ui

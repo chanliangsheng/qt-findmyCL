@@ -49,6 +49,7 @@ void Mzml::ReadMzml(QString file_name)
         }
     }
 
+
     return;
 }
 
@@ -82,24 +83,20 @@ void Mzml::ParserMs1(tinyxml2::XMLElement* spectrum_node)
 
     //从字节数组转化为数组，存储到m_ms1_vector中
     if(std::string(this->m_bit_type_param) == "32-bit float"){
-        std::vector<float>* mz_original_data = this->BytesToFloat(mz_data);
-        std::vector<float>* intensity_original_data = this->BytesToFloat(intensity_data);
+        //智能指针
+        std::shared_ptr<std::vector<float>> mz_original_data = this->BytesToFloat(mz_data);
+        std::shared_ptr<std::vector<float>> intensity_original_data = this->BytesToFloat(intensity_data);
         for(unsigned int i = 0;i < mz_original_data->size() ; i++){
            this->m_ms1_vector.emplace_back(Ms1((*mz_original_data)[i],(*intensity_original_data)[i],rt));
         }
-        //清除内存
-        delete  mz_original_data;
-        delete  intensity_original_data;
     }
     else if(std::string(this->m_bit_type_param) == "64-bit float"){
-        std::vector<double>* mz_original_data = this->BytesToDouble(mz_data);
-        std::vector<double>* intensity_original_data = this->BytesToDouble(intensity_data);
+        //智能指针
+        std::shared_ptr<std::vector<double>> mz_original_data = this->BytesToDouble(mz_data);
+        std::shared_ptr<std::vector<double>> intensity_original_data = this->BytesToDouble(intensity_data);
         for(unsigned int i = 0;i < mz_original_data->size() ; i++){
             this->m_ms1_vector.emplace_back(Ms1((*mz_original_data)[i],(*intensity_original_data)[i],rt));
         }
-        //清除内存
-        delete  mz_original_data;
-        delete  intensity_original_data;
     }
     return;
 }
@@ -127,8 +124,6 @@ void Mzml::ParserMs2(tinyxml2::XMLElement *spectrum_node)
         }
     }
 
-
-
     //获取mz节点和intensity节点
     XMLElement* mz_node = spectrum_node->FirstChildElement("binaryDataArrayList")->FirstChildElement();
     XMLElement* intensity_node = mz_node->NextSiblingElement();
@@ -148,24 +143,16 @@ void Mzml::ParserMs2(tinyxml2::XMLElement *spectrum_node)
 
     //从字节数组转化为数组，存储到m_ms2_vector中
     if(std::string(this->m_bit_type_param) == "32-bit float"){
-        std::vector<float>* mz_original_data = this->BytesToFloat(mz_data);
-        std::vector<float>* intensity_original_data = this->BytesToFloat(intensity_data);
+        //智能指针
+        std::shared_ptr<std::vector<float>> mz_original_data = this->BytesToFloat(mz_data);
+        std::shared_ptr<std::vector<float>> intensity_original_data = this->BytesToFloat(intensity_data);
         this->m_ms2_vector.emplace_back(Ms2(precursor_ion_mz , precursor_ion_intensity , rt , *mz_original_data , *intensity_original_data));
-        //清除内存
-//        std::vector<float>().swap(*mz_original_data);
-//        std::vector<float>().swap(*intensity_original_data);
-        delete  mz_original_data;
-        delete  intensity_original_data;
     }
     else if(std::string(this->m_bit_type_param) == "64-bit float"){
-        std::vector<double>* mz_original_data = this->BytesToDouble(mz_data);
-        std::vector<double>* intensity_original_data = this->BytesToDouble(intensity_data);
+        //智能指针
+        std::shared_ptr<std::vector<double>> mz_original_data = this->BytesToDouble(mz_data);
+        std::shared_ptr<std::vector<double>> intensity_original_data = this->BytesToDouble(intensity_data);
         this->m_ms2_vector.emplace_back(Ms2(precursor_ion_mz , precursor_ion_intensity , rt , *mz_original_data , *intensity_original_data));
-        //清除内存
-//        std::vector<double>().swap(*mz_original_data);
-//        std::vector<double>().swap(*intensity_original_data);
-        delete  mz_original_data;
-        delete  intensity_original_data;
     }
     return;
 }
@@ -208,9 +195,9 @@ void Mzml::GetEncodeCompressionParam(tinyxml2::XMLElement *spectrum_node)
     }
 }
 
-std::vector<float>* Mzml::BytesToFloat(std::string &byte_array)
+std::shared_ptr<std::vector<float>> Mzml::BytesToFloat(std::string &byte_array)
 {
-    std::vector<float>* vector_float = new std::vector<float>;//初始化为空数组
+    std::shared_ptr<std::vector<float>> vector_float = std::make_shared<std::vector<float>>();//初始化为空数组
     float output;
     for(unsigned int i = 0 ; i < byte_array.size(); i = i + 4){
         *((uchar*)(&output) + 3) = byte_array[i + 3];
@@ -219,12 +206,12 @@ std::vector<float>* Mzml::BytesToFloat(std::string &byte_array)
         *((uchar*)(&output) + 0) = byte_array[i + 0];
         vector_float->emplace_back(output);
     }
-    return vector_float;//返回数组的指针
+    return vector_float;//返回数组的智能指针
 }
 
-std::vector<double>* Mzml::BytesToDouble(std::string &byte_array)
+std::shared_ptr<std::vector<double>> Mzml::BytesToDouble(std::string &byte_array)
 {
-    std::vector<double>* vector_double = new std::vector<double>;//初始化为空数组
+    std::shared_ptr<std::vector<double>> vector_double = std::make_shared<std::vector<double>>();//初始化为空数组
     double output;
     for(unsigned int i = 0 ; i < byte_array.size(); i = i + 8){
         *((uchar*)(&output) + 7) = byte_array[i + 7];
@@ -237,7 +224,7 @@ std::vector<double>* Mzml::BytesToDouble(std::string &byte_array)
         *((uchar*)(&output) + 0) = byte_array[i + 0];
         vector_double->emplace_back(output);
     }
-    return vector_double;//返回数组的指针
+    return vector_double;//返回数组的智能指针
 }
 
 std::string Mzml::ZlibDecompress(const std::string &str)

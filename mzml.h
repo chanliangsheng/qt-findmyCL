@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <iomanip>
 #include <sstream>
+#include <memory>
 
 
 class Mzml: public QObject
@@ -35,8 +36,8 @@ public:
     void ParserMs2(tinyxml2::XMLElement *spectrum_node);//解析一级节点
     char GetMsLevel(tinyxml2::XMLElement *spectrum_node);//获取该节点是属于一级节点还是二级节点
     void GetEncodeCompressionParam(tinyxml2::XMLElement *spectrum_node);//获取数据编码的压缩的方法
-    std::vector<float>* BytesToFloat(std::string &byte_array);//转化byte数组成float数组
-    std::vector<double>* BytesToDouble(std::string &byte_array);//转化byte数组成double数组
+    std::shared_ptr<std::vector<float>> BytesToFloat(std::string &byte_array);//转化byte数组成float数组，智能指针
+    std::shared_ptr<std::vector<double>> BytesToDouble(std::string &byte_array);//转化byte数组成double数组，智能指针
     std::string ZlibDecompress(const std::string& str);//解压zlib的字符串
 };
 

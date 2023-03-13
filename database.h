@@ -9,6 +9,7 @@
 #include <QSqlQuery>
 #include <QDebug>
 #include <databaserecord.h>
+#include <memory>
 
 class Database
 {
@@ -29,7 +30,7 @@ public:
 public:
     void LoadDatebase(QString file_name = "db/database.db");//加载数据库
     void LoadAllTable();//加载数据库中的所有数据表
-    std::vector<DatabaseRecord>* LoadSingelTable(QString table);//加载数据库中的单个数据表
+    std::shared_ptr<std::vector<DatabaseRecord>> LoadSingelTable(QString table);//加载数据库中的单个数据表
 };
 
 

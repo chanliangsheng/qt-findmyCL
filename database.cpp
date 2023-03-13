@@ -50,11 +50,10 @@ void Database::LoadAllTable()
 }
 
 
-std::vector<DatabaseRecord> *Database::LoadSingelTable(QString table)
+std::shared_ptr<std::vector<DatabaseRecord>> Database::LoadSingelTable(QString table)
 {
-    //结果初始化
-    std::vector<DatabaseRecord>* ret = new std::vector<DatabaseRecord>;
-
+    //结果初始化，智能指针
+    std::shared_ptr<std::vector<DatabaseRecord>> ret = std::make_shared<std::vector<DatabaseRecord>>();
     //绑定某个数据库
     QSqlQuery sql_query(this->m_database);
     QString select_all_sql = "select * from " + table + ";";
